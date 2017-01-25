@@ -72,7 +72,13 @@ return array(
     
     'service_manager' => array(
         'invokables' => array(
-            'KofusGoogleMapsService' => 'Kofus\Dropbox\Service\DropboxService',
+            'KofusGoogleMapsService' => 'Kofus\GoogleMaps\Service\GoogleMapsService'
+        )
+    ),
+    
+    'view_helpers' => array(
+        'invokables' => array(
+            'googleMap' => 'Kofus\GoogleMaps\View\Helper\GoogleMapHelper'
         )
     ),
     
