@@ -1,0 +1,12 @@
+{
+    "name": "kofus/magenta-google-maps",
+    "type": "library",
+    
+    "autoload": {
+        "psr-0": {
+            "Kofus\\GoogleMaps\\": "src/Kofus/GoogleMaps/"
+        },
+        "classmap" : ["Kofus/GoogleMaps/Module.php"]
+    }
+}
+
