@@ -1,17 +1,27 @@
 <?php
 
 namespace Kofus\GoogleMaps\View\Helper;
-use Zend\View\Helper\AbstractHelper;
+
 use Zend\Uri\UriFactory;
 use Zend\Math\Rand;
+use Zend\View\Helper\AbstractHtmlElement;
 
-class GoogleMapHelper extends AbstractHelper
+class GoogleMapHelper extends AbstractHtmlElement
 {
     
     protected $uriGoogleApis = 'https://maps.googleapis.com/maps/api/js';
+    protected $attribs = array();
+    protected $markers = array();
     
-    public function __invoke()
+    public function __invoke(array $attribs = array())
     {
+        $this->attribs = $attribs;
+        return $this;
+    }
+    
+    public function addMarker($lat, $lng, $title)
+    {
+        $this->markers[] = array('lat' => $lat, 'lng' => $lng, 'title' => $title);
         return $this;
     }
     
@@ -69,17 +79,36 @@ class GoogleMapHelper extends AbstractHelper
         ));
         $this->getView()->headScript()->appendFile($uri, 'text/javascript', array('async' => 'async', 'defer' => 'defer'));
         $this->getView()->headScript()->appendScript($this->buildScript());
-        return '<div style="width: 100%; height: 400px; background-color: silver" id="map_'.$this->getMapId().'">MAP</div>';
+        $this->attribs['id'] = $this->normalizeId($this->getMapId());
+        if (! isset($this->attribs['style']))
+            $this->attribs['style'] = 'width: 100%; height: 300px; background-color: #eee';
+        return '<div '.$this->htmlAttribs($this->attribs).'></div>';
+    }
+    
+    protected function renderMarkers()
+    {
+        $js = '';
+        foreach ($this->markers as $marker) {
+            $js .= " 
+                new google.maps.Marker({
+                    position: {lat: ".$marker['lat'].", lng: ".$marker['lng']."},
+                    map: map,
+                    title: '".$this->getView()->escapeHtml($marker['title'])."'
+                });
+            ";
+        }
+        return $js;
     }
     
     protected function buildScript()
     {
         $s = " 
         function initMap_".$this->getMapId()."(){
-            var map = new google.maps.Map(document.getElementById('map_".$this->getMapId()."'), {
+            var map = new google.maps.Map(document.getElementById('".$this->getMapId()."'), {
                 zoom: ".$this->getZoom().",
                 center: {lat: ".$this->getLatitude().", lng: ".$this->getLongitude()."}
             });
+            ".$this->renderMarkers()."
         }";
         
         return $s;
