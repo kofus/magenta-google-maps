@@ -61,6 +61,20 @@ class GoogleMapHelper extends AbstractHtmlElement
         return $this->zoom;
     }
     
+    protected $apiKey;
+    
+    public function setApiKey($value)
+    {
+        $this->apiKey = $value; return $this;
+    }
+    
+    public function getApiKey()
+    {
+        if ($this->apiKey)
+            return $this->apiKey;
+        return $this->getView()->config()->get('google_maps.api_key');
+    }
+    
     protected $mapId;
     
     public function getMapId()
@@ -74,7 +88,7 @@ class GoogleMapHelper extends AbstractHtmlElement
     {
         $uri = UriFactory::factory($this->uriGoogleApis);
         $uri->setQuery(array(
-        	'key' => $this->getView()->config()->get('google_maps.api_key'),
+        	'key' => $this->getApiKey(),
             'callback' => 'initMap_' . $this->getMapId()
         ));
         $this->getView()->headScript()->appendFile($uri, 'text/javascript', array('async' => 'async', 'defer' => 'defer'));
